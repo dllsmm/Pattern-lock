@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pattern Lock</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h2 {
+      margin-top: 10px;
+      margin-bottom: 40px;
+      font-size: 1.5rem;
+      text-align: center;
+      color: #00e5ff;
+    }
+
+    .grid {
+      width: 300px;
+      height: 300px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      touch-action: none;
+    }
+
+    .dot {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #333;
+      border: 2px solid #00e5ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      user-select: none;
+    }
+
+    .dot.active {
+      background: #00e5ff;
+      color: black;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #ff5252;
+    }
+
+    @media (max-width: 500px) {
+      .grid {
+        width: 240px;
+        height: 240px;
+        gap: 15px;
+      }
+
+      .dot {
+        width: 60px;
+        height: 60px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Our Advance Security by Our Rental</h2>
+
+  <div class="grid" id="patternGrid">
+    <!-- 9 dots -->
+    <div class="dot" data-id="1">1</div>
+    <div class="dot" data-id="2">2</div>
+    <div class="dot" data-id="3">3</div>
+    <div class="dot" data-id="4">4</div>
+    <div class="dot" data-id="5">5</div>
+    <div class="dot" data-id="6">6</div>
+    <div class="dot" data-id="7">7</div>
+    <div class="dot" data-id="8">8</div>
+    <div class="dot" data-id="9">9</div>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const grid = document.getElementById("patternGrid");
+    const dots = document.querySelectorAll(".dot");
+    const message = document.getElementById("message");
+    let pattern = [];
+    let isDrawing = false;
+
+    const correctPattern = [1, 2, 5, 8]; // ✅ Change this pattern here
+
+    function resetPattern() {
+      pattern = [];
+      dots.forEach(dot => dot.classList.remove("active"));
+    }
+
+    function checkPattern() {
+      if (JSON.stringify(pattern) === JSON.stringify(correctPattern)) {
+        message.style.color = "#00e676";
+        message.textContent = "✅ Access Granted!";
+      } else {
+        message.style.color = "#ff5252";
+        message.textContent = "❌ Wrong Pattern!";
+      }
+      setTimeout(() => {
+        message.textContent = "";
+        resetPattern();
+      }, 1500);
+    }
+
+    function handleDotEnter(e) {
+      const dot = e.target;
+      const id = parseInt(dot.dataset.id);
+      if (!pattern.includes(id)) {
+        pattern.push(id);
+        dot.classList.add("active");
+      }
+    }
+
+    grid.addEventListener("mousedown", e => {
+      isDrawing = true;
+      handleDotEnter(e);
+    });
+
+    grid.addEventListener("touchstart", e => {
+      isDrawing = true;
+      const touch = e.touches[0];
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (elem && elem.classList.contains("dot")) {
+        handleDotEnter({ target: elem });
+      }
+    }, { passive: false });
+
+    grid.addEventListener("mousemove", e => {
+      if (isDrawing && e.target.classList.contains("dot")) {
+        handleDotEnter(e);
+      }
+    });
+
+    grid.addEventListener("touchmove", e => {
+      if (!isDrawing) return;
+      const touch = e.touches[0];
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (elem && elem.classList.contains("dot")) {
+        handleDotEnter({ target: elem });
+      }
+    }, { passive: false });
+
+    window.addEventListener("mouseup", () => {
+      if (isDrawing) {
+        isDrawing = false;
+        checkPattern();
+      }
+    });
+
+    window.addEventListener("touchend", () => {
+      if (isDrawing) {
+        isDrawing = false;
+        checkPattern();
+      }
+    });
+  </script>
+</body>
+</html>
